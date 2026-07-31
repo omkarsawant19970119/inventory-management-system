@@ -1,0 +1,25 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+target/
+
+# Java
+*.class
+*.jar
+*.war
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+
+# IntelliJ cache
+out/
