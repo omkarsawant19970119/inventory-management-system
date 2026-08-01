@@ -34,3 +34,12 @@ management:
       exposure:
         include: "*"
 
+logging:
+  level:
+    root: INFO
+    com.omkar.inventory: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.security: INFO
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger - %msg%n"

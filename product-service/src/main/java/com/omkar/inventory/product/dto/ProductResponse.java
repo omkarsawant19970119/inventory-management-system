@@ -3,21 +3,20 @@ package com.omkar.inventory.product.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProductResponse {
 
     private Long id;
 
-    private String sku;
+    private String productName;
 
-    private String name;
-
-    private String description;
+    private String skuCode;
 
     private String category;
 
@@ -27,6 +26,14 @@ public class ProductResponse {
 
     private Integer quantity;
 
-    private String status;
+    private String unit;
+
+    private String description;
+
+    private Boolean active;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
 }

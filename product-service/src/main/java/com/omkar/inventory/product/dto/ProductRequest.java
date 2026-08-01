@@ -13,17 +13,14 @@ import java.math.BigDecimal;
 public class ProductRequest {
 
     @NotBlank
-    private String sku;
+    private String productName;
 
     @NotBlank
-    private String name;
-
-    private String description;
+    private String skuCode;
 
     @NotBlank
     private String category;
 
-    @NotBlank
     private String brand;
 
     @NotNull
@@ -33,5 +30,9 @@ public class ProductRequest {
     @NotNull
     @PositiveOrZero
     private Integer quantity;
+
+    private String unit;
+
+    private String description;
 
 }

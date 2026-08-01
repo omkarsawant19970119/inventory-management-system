@@ -2,19 +2,18 @@ package com.omkar.inventory.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Product {
 
     @Id
@@ -22,17 +21,12 @@ public class Product {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String sku;
+    private String skuCode;
 
     @Column(nullable = false)
-    private String name;
+    private String productName;
 
-    @Column(length = 3000)
     private String description;
-
-    private String category;
-
-    private String brand;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -40,12 +34,23 @@ public class Product {
     @Column(nullable = false)
     private Integer quantity;
 
-    private String status;
+    private String category;
 
-    @CreationTimestamp
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
