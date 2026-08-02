@@ -11,5 +11,6 @@ public interface InventoryServiceClient {
     @PutMapping("/api/inventory/add-stock-from-purchase/{productId}")
     void addStockFromPurchase(@PathVariable("productId") Long productId,
                   @RequestParam("quantity") Integer quantity);
+    //inventory service
 
 }
