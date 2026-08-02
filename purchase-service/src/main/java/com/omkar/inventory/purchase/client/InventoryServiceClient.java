@@ -8,8 +8,8 @@ import java.util.Map;
 @FeignClient(name = "INVENTORY-SERVICE")
 public interface InventoryServiceClient {
 
-    @PutMapping("/api/inventory/add-stock/{productId}")
-    void addStock(@PathVariable("productId") Long productId,
-                  @RequestParam Integer quantity);
+    @PutMapping("/api/inventory/add-stock-from-purchase/{productId}")
+    void addStockFromPurchase(@PathVariable("productId") Long productId,
+                  @RequestParam("quantity") Integer quantity);
 
 }

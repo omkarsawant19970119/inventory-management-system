@@ -99,4 +99,14 @@ public class InventoryController {
                 inventoryService.releaseStock(productId, request.getQuantity())
         );
     }
+
+    @PutMapping("/add-stock-from-purchase/{productId}")
+    public ResponseEntity<String> addStockFromPurchase(
+            @PathVariable("productId") Long productId,
+            @RequestParam("quantity") Integer quantity) {
+
+        inventoryService.addStockFromPurchase(productId, quantity);
+
+        return ResponseEntity.ok("Stock Updated Successfully");
+    }
 }

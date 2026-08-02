@@ -1,5 +1,6 @@
 package com.omkar.inventory.purchase.service;
 
+import com.omkar.inventory.purchase.client.InventoryServiceClient;
 import com.omkar.inventory.purchase.client.ProductServiceClient;
 import com.omkar.inventory.purchase.dto.PurchaseRequest;
 import com.omkar.inventory.purchase.dto.PurchaseResponse;
@@ -17,6 +18,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     private final PurchaseRepository repository;
     private final ProductServiceClient productClient;
+    private final InventoryServiceClient inventoryClient;
 
     @Override
     public PurchaseResponse createPurchase(PurchaseRequest request) {
@@ -32,6 +34,10 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .build();
 
         repository.save(purchase);
+
+        inventoryClient.addStockFromPurchase(
+                request.getProductId(),
+                request.getQuantity());
 
         return map(purchase);
     }

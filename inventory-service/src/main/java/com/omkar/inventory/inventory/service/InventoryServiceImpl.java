@@ -34,6 +34,12 @@ public class InventoryServiceImpl implements InventoryService {
         }
         Inventory inventory = inventoryMapper.toEntity(request);
 
+        if (inventoryRepository.findByProductId(request.getProductId()).isPresent()) {
+            throw new RuntimeException("Inventory already exists for this product");
+        }
+
+        inventoryRepository.save(inventory);
+
         Inventory savedInventory = inventoryRepository.save(inventory);
 
         return inventoryMapper.toResponse(savedInventory);
@@ -173,5 +179,18 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory saved = inventoryRepository.save(inventory);
 
         return inventoryMapper.toResponse(saved);
+    }
+
+    @Override
+    public void addStockFromPurchase(Long productId, Integer quantity) {
+
+        Inventory inventory = inventoryRepository
+                .findByProductId(productId)
+                .orElseThrow(() ->
+                        new RuntimeException("Inventory not found"));
+
+        inventory.setAvailableQuantity(inventory.getAvailableQuantity() + quantity);
+
+        inventoryRepository.save(inventory);
     }
 }
