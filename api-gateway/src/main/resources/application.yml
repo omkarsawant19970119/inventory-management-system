@@ -1,6 +1,23 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: api-gateway
 
-  profiles:
-    active: dev
+  cloud:
+    gateway:
+      routes:
+        - id: inventory-service
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=/api/inventory/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+      instance:
+        prefer-ip-address: true
+        ip-address: 127.0.0.1

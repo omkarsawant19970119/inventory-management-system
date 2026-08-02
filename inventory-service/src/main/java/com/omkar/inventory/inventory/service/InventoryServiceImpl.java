@@ -1,7 +1,9 @@
 package com.omkar.inventory.inventory.service;
 
+import com.omkar.inventory.inventory.client.ProductServiceClient;
 import com.omkar.inventory.inventory.dto.InventoryRequest;
 import com.omkar.inventory.inventory.dto.InventoryResponse;
+import com.omkar.inventory.inventory.dto.ProductResponse;
 import com.omkar.inventory.inventory.entity.Inventory;
 import com.omkar.inventory.inventory.exception.InsufficientStockException;
 import com.omkar.inventory.inventory.exception.InvalidStockOperationException;
@@ -20,10 +22,16 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final InventoryMapper inventoryMapper;
+    private final ProductServiceClient productServiceClient;
 
     @Override
     public InventoryResponse createInventory(InventoryRequest request) {
+        ProductResponse product =
+                productServiceClient.getProductById(request.getProductId());
 
+        if (product == null) {
+            throw new InventoryNotFoundException("Product not found");
+        }
         Inventory inventory = inventoryMapper.toEntity(request);
 
         Inventory savedInventory = inventoryRepository.save(inventory);
