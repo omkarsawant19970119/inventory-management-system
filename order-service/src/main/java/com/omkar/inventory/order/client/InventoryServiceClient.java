@@ -1,6 +1,6 @@
 package com.omkar.inventory.order.client;
 
-import com.omkar.inventory.inventory.dto.InventoryResponse;
+import com.omkar.inventory.order.dto.InventoryResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
