@@ -193,4 +193,38 @@ public class InventoryServiceImpl implements InventoryService {
 
         inventoryRepository.save(inventory);
     }
+
+    @Override
+    public InventoryResponse getInventory(Long productId) {
+
+        Inventory inventory = inventoryRepository
+                .findByProductId(productId)
+                .orElseThrow(() ->
+                        new RuntimeException("Inventory not found"));
+
+        InventoryResponse response = new InventoryResponse();
+
+        response.setProductId(inventory.getProductId());
+        response.setAvailableQuantity(inventory.getAvailableQuantity());
+
+        return response;
+    }
+
+    @Override
+    public void reduceStock(Long productId, Integer quantity) {
+
+        Inventory inventory = inventoryRepository
+                .findByProductId(productId)
+                .orElseThrow(() ->
+                        new RuntimeException("Inventory not found"));
+
+        if (inventory.getAvailableQuantity() < quantity) {
+            throw new RuntimeException("Insufficient Stock");
+        }
+
+        inventory.setAvailableQuantity(
+                inventory.getAvailableQuantity() - quantity);
+
+        inventoryRepository.save(inventory);
+    }
 }
