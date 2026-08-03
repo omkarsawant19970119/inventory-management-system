@@ -27,4 +27,8 @@ public interface InventoryService {
     InventoryResponse releaseStock(Long productId, Integer quantity);
 
     void addStockFromPurchase(Long productId, Integer quantity);
+
+    InventoryResponse getInventory(Long productId);
+
+    void reduceStock(Long productId, Integer quantity);
 }
