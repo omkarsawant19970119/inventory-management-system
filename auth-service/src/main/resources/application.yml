@@ -12,3 +12,7 @@ spring:
     instance:
       prefer-ip-address: true
       ip-address: 127.0.0.1
+
+jwt:
+  secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
+  expiration: 86400000

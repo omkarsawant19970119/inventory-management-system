@@ -5,7 +5,7 @@ import com.omkar.inventory.auth.entity.Role;
 import com.omkar.inventory.auth.entity.User;
 import com.omkar.inventory.auth.repository.*;
 import com.omkar.inventory.auth.service.AuthService;
-import com.omkar.inventory.auth.util.JwtService;
+import com.omkar.inventory.common.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
