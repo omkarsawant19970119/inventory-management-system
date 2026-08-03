@@ -2,32 +2,25 @@ package com.omkar.inventory.supplier.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class SupplierRequest {
+
+    @NotBlank
+    private String supplierCode;
 
     @NotBlank
     private String companyName;
 
-    @NotBlank
     private String contactPerson;
 
     @Email
     private String email;
 
-    @NotBlank
     private String phone;
 
     private String gstNumber;
-
-    private String panNumber;
 
     private String address;
 
@@ -37,7 +30,7 @@ public class SupplierRequest {
 
     private String country;
 
-    private String postalCode;
+    private String pincode;
 
-    private String paymentTerms;
+    private Boolean active;
 }

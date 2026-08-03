@@ -1,11 +1,11 @@
 package com.omkar.inventory.supplier.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
+@Data
 @Builder
 public class SupplierResponse {
 
@@ -23,11 +23,19 @@ public class SupplierResponse {
 
     private String gstNumber;
 
+    private String address;
+
     private String city;
 
     private String state;
 
-    private Double rating;
+    private String country;
+
+    private String pincode;
 
     private Boolean active;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
