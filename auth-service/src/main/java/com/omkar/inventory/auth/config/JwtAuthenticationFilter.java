@@ -1,7 +1,8 @@
 package com.omkar.inventory.auth.config;
 
 import com.omkar.inventory.auth.security.CustomUserDetailsService;
-import com.omkar.inventory.auth.util.JwtService;
+
+import com.omkar.inventory.common.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;

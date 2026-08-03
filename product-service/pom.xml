@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.omkar.inventory</groupId>
             <artifactId>common-library</artifactId>
-            <version>1.0.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Boot -->
