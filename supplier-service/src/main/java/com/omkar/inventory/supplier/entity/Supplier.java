@@ -1,7 +1,6 @@
 package com.omkar.inventory.supplier.entity;
 
 import jakarta.persistence.*;
-
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,20 +18,21 @@ public class Supplier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String supplierCode;
 
+    @Column(nullable = false)
     private String companyName;
 
     private String contactPerson;
 
+    @Column(unique = true)
     private String email;
 
     private String phone;
 
+    @Column(unique = true)
     private String gstNumber;
-
-    private String panNumber;
 
     private String address;
 
@@ -42,15 +42,22 @@ public class Supplier {
 
     private String country;
 
-    private String postalCode;
+    private String pincode;
 
-    private String paymentTerms;
-
-    private Double rating;
-
-    private Boolean active;
+    private Boolean active = true;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
