@@ -16,3 +16,14 @@ spring:
 jwt:
   secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
   expiration: 86400000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+
+  swagger-ui:
+    path: /swagger-ui.html
+
+    operationsSorter: method
+
+    tagsSorter: alpha
