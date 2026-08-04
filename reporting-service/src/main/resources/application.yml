@@ -32,3 +32,9 @@ management:
 
 jwt:
   secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
