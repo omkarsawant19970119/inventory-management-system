@@ -5,6 +5,11 @@ spring:
   application:
     name: reporting-service
 
+    data:
+      redis:
+        host: localhost
+        port: 6379
+        timeout: 5000
   datasource:
     url: jdbc:mysql://localhost:3306/reporting_db
     username: root

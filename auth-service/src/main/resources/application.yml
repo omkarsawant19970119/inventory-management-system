@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: auth-service
@@ -8,10 +11,11 @@ spring:
   profiles:
     active: dev
 
-  eureka:
-    instance:
-      prefer-ip-address: true
-      ip-address: 127.0.0.1
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
 
 jwt:
   secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
@@ -23,7 +27,5 @@ springdoc:
 
   swagger-ui:
     path: /swagger-ui.html
-
     operationsSorter: method
-
     tagsSorter: alpha

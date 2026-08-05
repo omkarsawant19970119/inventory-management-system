@@ -1,5 +1,6 @@
 package com.omkar.inventory.reporting.service;
 
+import com.omkar.inventory.common.cache.CacheNames;
 import com.omkar.inventory.reporting.dto.ReportRequest;
 import com.omkar.inventory.reporting.dto.ReportResponse;
 import com.omkar.inventory.reporting.entity.Report;
@@ -7,6 +8,8 @@ import com.omkar.inventory.reporting.mapper.ReportMapper;
 import com.omkar.inventory.reporting.repository.ReportRepository;
 import com.omkar.inventory.reporting.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

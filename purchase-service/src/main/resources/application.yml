@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: purchase-service
+    data:
+      redis:
+        host: localhost
+        port: 6379
+        timeout: 5000
 
   datasource:
     url: jdbc:mysql://localhost:3306/purchase_db

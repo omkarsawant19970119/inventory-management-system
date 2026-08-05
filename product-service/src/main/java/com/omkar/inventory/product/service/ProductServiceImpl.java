@@ -9,6 +9,10 @@ import com.omkar.inventory.product.mapper.ProductMapper;
 import com.omkar.inventory.product.repository.ProductRepository;
 import com.omkar.inventory.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+
 public class ProductServiceImpl implements ProductService {
 
     private static final Logger log =
@@ -31,6 +36,19 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
+    @Caching(
+            evict = {
+
+                    @CacheEvict(value = "allProducts", allEntries = true),
+
+                    @CacheEvict(value = "productPages", allEntries = true),
+
+                    @CacheEvict(value = "productSearch", allEntries = true),
+
+                    @CacheEvict(value = "productsByCategory", allEntries = true)
+
+            }
+    )
     public ProductResponse createProduct(ProductRequest request) {
 
         log.info("Creating Product : {}", request.getProductName());
@@ -50,6 +68,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(
+
+            put = {
+
+                    @CachePut(value = "products", key = "#id")
+
+            },
+
+            evict = {
+
+                    @CacheEvict(value = "allProducts", allEntries = true),
+
+                    @CacheEvict(value = "productPages", allEntries = true),
+
+                    @CacheEvict(value = "productSearch", allEntries = true),
+
+                    @CacheEvict(value = "productsByCategory", allEntries = true),
+
+                    @CacheEvict(value = "productsBySku", allEntries = true)
+
+            }
+
+    )
     public ProductResponse updateProduct(Long id,
                                          ProductRequest request) {
 
@@ -67,6 +108,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "products", key = "#id")
     public ProductResponse getProduct(Long id) {
 
         log.info("Fetching Product {}", id);
@@ -81,6 +123,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("allProducts")
     public List<ProductResponse> getAllProducts() {
 
         return repository.findAll()
@@ -90,6 +133,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(
+
+            evict = {
+
+                    @CacheEvict(value="products",key="#id"),
+
+                    @CacheEvict(value="productsBySku",allEntries=true),
+
+                    @CacheEvict(value="productsByCategory",allEntries=true),
+
+                    @CacheEvict(value="allProducts",allEntries=true),
+
+                    @CacheEvict(value="productPages",allEntries=true),
+
+                    @CacheEvict(value="productSearch",allEntries=true)
+
+            }
+
+    )
     public void deleteProduct(Long id) {
 
         log.info("Deleting Product {}", id);
@@ -139,6 +201,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(
+            value="productsByCategory",
+            key="#category"
+    )
     public List<ProductResponse> getProductsByCategory(String category) {
 
         return repository
@@ -149,6 +215,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "productsBySku", key = "#skuCode")
     public ProductResponse getProductBySku(String skuCode) {
 
         Product product = repository
