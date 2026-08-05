@@ -1,5 +1,6 @@
 package com.omkar.inventory.purchase.service;
 
+import com.omkar.inventory.common.cache.CacheNames;
 import com.omkar.inventory.purchase.client.InventoryServiceClient;
 import com.omkar.inventory.purchase.client.ProductServiceClient;
 import com.omkar.inventory.purchase.dto.PurchaseRequest;
@@ -7,6 +8,7 @@ import com.omkar.inventory.purchase.dto.PurchaseResponse;
 import com.omkar.inventory.purchase.entity.Purchase;
 import com.omkar.inventory.purchase.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -51,6 +53,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Cacheable(value = CacheNames.PURCHASES, key = "#id")
     public PurchaseResponse getPurchase(Long id) {
 
         Purchase purchase = repository.findById(id)

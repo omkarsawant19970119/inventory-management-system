@@ -1,5 +1,6 @@
 package com.omkar.inventory.inventory.service;
 
+import com.omkar.inventory.common.cache.CacheNames;
 import com.omkar.inventory.inventory.client.ProductServiceClient;
 import com.omkar.inventory.inventory.dto.InventoryRequest;
 import com.omkar.inventory.inventory.dto.InventoryResponse;
@@ -12,6 +13,10 @@ import com.omkar.inventory.inventory.mapper.InventoryMapper;
 import com.omkar.inventory.inventory.repository.InventoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,7 +60,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public InventoryResponse getInventoryById(Long id) {
+    @Cacheable(value = CacheNames.INVENTORY, key = "#id")
+    public InventoryResponse getInventoryById(Long id){
 
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() ->
@@ -65,6 +71,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Caching(
+            put = {
+                    @CachePut(value = CacheNames.INVENTORY,key="#id"),
+                    @CachePut(value = CacheNames.INVENTORY_BY_PRODUCT,
+                            key="#result.productId")
+            }
+    )
     public InventoryResponse updateInventory(Long id,
                                              InventoryRequest request) {
 
@@ -85,6 +98,12 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value=CacheNames.INVENTORY,key="#id"),
+                    @CacheEvict(value=CacheNames.INVENTORY_BY_PRODUCT,allEntries=true)
+            }
+    )
     public void deleteInventory(Long id) {
 
         Inventory inventory = inventoryRepository.findById(id)
@@ -95,6 +114,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @CachePut(
+            value = CacheNames.INVENTORY_BY_PRODUCT,
+            key = "#productId"
+    )
     public InventoryResponse addStock(Long productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -111,6 +134,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @CachePut(
+            value = CacheNames.INVENTORY_BY_PRODUCT,
+            key = "#productId"
+    )
     public InventoryResponse removeStock(Long productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -132,6 +159,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @CachePut(
+            value = CacheNames.INVENTORY_BY_PRODUCT,
+            key = "#productId"
+    )
     public InventoryResponse reserveStock(Long productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -157,6 +188,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @CachePut(
+            value = CacheNames.INVENTORY_BY_PRODUCT,
+            key = "#productId"
+    )
     public InventoryResponse releaseStock(Long productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -182,6 +217,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @CachePut(
+            value = CacheNames.INVENTORY_BY_PRODUCT,
+            key = "#productId"
+    )
     public void addStockFromPurchase(Long productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository
@@ -195,7 +234,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public InventoryResponse getInventory(Long productId) {
+    @Cacheable(value = CacheNames.INVENTORY_BY_PRODUCT, key = "#productId")
+    public InventoryResponse getInventory(Long productId){
 
         Inventory inventory = inventoryRepository
                 .findByProductId(productId)
@@ -211,6 +251,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @CachePut(
+            value = CacheNames.INVENTORY_BY_PRODUCT,
+            key = "#productId"
+    )
     public void reduceStock(Long productId, Integer quantity) {
 
         Inventory inventory = inventoryRepository

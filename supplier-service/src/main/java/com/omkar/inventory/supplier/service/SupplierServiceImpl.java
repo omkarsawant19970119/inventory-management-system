@@ -1,11 +1,15 @@
 package com.omkar.inventory.supplier.service;
 
+import com.omkar.inventory.common.cache.CacheNames;
 import com.omkar.inventory.supplier.dto.SupplierRequest;
 import com.omkar.inventory.supplier.dto.SupplierResponse;
 import com.omkar.inventory.supplier.entity.Supplier;
 import com.omkar.inventory.supplier.repository.SupplierRepository;
 import com.omkar.inventory.supplier.service.SupplierService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +31,7 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    @Cacheable(value = CacheNames.SUPPLIERS, key = "#id")
     public SupplierResponse getSupplierById(Long id) {
 
         Supplier supplier = supplierRepository.findById(id)
@@ -46,6 +51,7 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    @CachePut(value = CacheNames.SUPPLIERS, key = "#id")
     public SupplierResponse updateSupplier(Long id,
                                            SupplierRequest request) {
 
@@ -72,6 +78,7 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    @CacheEvict(value = CacheNames.SUPPLIERS, key = "#id")
     public void deleteSupplier(Long id) {
 
         supplierRepository.deleteById(id);
@@ -88,6 +95,10 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    @Cacheable(
+            value = CacheNames.ACTIVE_SUPPLIERS,
+            key = "#active"
+    )
     public List<SupplierResponse> getSupplierByStatus(Boolean active) {
 
         return supplierRepository.findByActive(active)
