@@ -38,3 +38,96 @@ eureka:
 
 jwt:
   secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
+
+resilience4j:
+
+  circuitbreaker:
+
+    instances:
+
+      productService:
+
+        slidingWindowSize: 10
+
+        minimumNumberOfCalls: 5
+
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        waitDurationInOpenState: 30s
+
+        failureRateThreshold: 50
+
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      inventoryService:
+
+        slidingWindowSize: 10
+
+        minimumNumberOfCalls: 5
+
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        waitDurationInOpenState: 30s
+
+        failureRateThreshold: 50
+
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+
+  ratelimiter:
+    instances:
+
+      productService:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
+
+      inventoryService:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
+
+
+
+  retry:
+
+    instances:
+
+      productService:
+
+        maxAttempts: 3
+
+        waitDuration: 2s
+
+        retryExceptions:
+          - feign.RetryableException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+
+      inventoryService:
+
+        maxAttempts: 3
+
+        waitDuration: 2s
+
+        retryExceptions:
+          - feign.RetryableException
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+
+
+  bulkhead:
+
+    instances:
+
+      productService:
+
+        maxConcurrentCalls: 20
+
+        maxWaitDuration: 2s
+
+      inventoryService:
+
+        maxConcurrentCalls: 20
+
+        maxWaitDuration: 2s
