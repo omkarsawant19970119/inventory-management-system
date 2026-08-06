@@ -1,6 +1,7 @@
 package com.omkar.inventory.inventory.service;
 
 import com.omkar.inventory.common.cache.CacheNames;
+import com.omkar.inventory.common.exception.ServiceUnavailableException;
 import com.omkar.inventory.inventory.client.ProductServiceClient;
 import com.omkar.inventory.inventory.dto.InventoryRequest;
 import com.omkar.inventory.inventory.dto.InventoryResponse;
@@ -11,6 +12,9 @@ import com.omkar.inventory.inventory.exception.InvalidStockOperationException;
 import com.omkar.inventory.inventory.exception.InventoryNotFoundException;
 import com.omkar.inventory.inventory.mapper.InventoryMapper;
 import com.omkar.inventory.inventory.repository.InventoryRepository;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,11 +22,15 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import com.omkar.inventory.common.resilience.ResilienceConstants;
+import com.omkar.inventory.common.resilience.FallbackMessages;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+
 public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
@@ -30,6 +38,18 @@ public class InventoryServiceImpl implements InventoryService {
     private final ProductServiceClient productServiceClient;
 
     @Override
+    @Bulkhead(
+            name = ResilienceConstants.PRODUCT_SERVICE,
+            type = Bulkhead.Type.SEMAPHORE,
+            fallbackMethod = "productFallback")
+    @RateLimiter(
+            name = ResilienceConstants.PRODUCT_SERVICE,
+            fallbackMethod = "productRateLimitFallback")
+    @Retry(
+            name = ResilienceConstants.PRODUCT_SERVICE)
+    @CircuitBreaker(
+            name = ResilienceConstants.PRODUCT_SERVICE,
+            fallbackMethod = "createInventoryFallback")
     public InventoryResponse createInventory(InventoryRequest request) {
         ProductResponse product =
                 productServiceClient.getProductById(request.getProductId());
@@ -43,11 +63,27 @@ public class InventoryServiceImpl implements InventoryService {
             throw new RuntimeException("Inventory already exists for this product");
         }
 
-        inventoryRepository.save(inventory);
-
         Inventory savedInventory = inventoryRepository.save(inventory);
 
         return inventoryMapper.toResponse(savedInventory);
+    }
+
+
+
+    private InventoryResponse productRateLimitFallback(
+            InventoryRequest request,
+            Throwable ex) {
+
+        throw new ServiceUnavailableException(
+                FallbackMessages.PRODUCT_SERVICE_DOWN);
+    }
+
+    private InventoryResponse createInventoryFallback(
+            InventoryRequest request,
+            Throwable ex) {
+
+        throw new ServiceUnavailableException(
+                FallbackMessages.INVENTORY_SERVICE_DOWN);
     }
 
     @Override

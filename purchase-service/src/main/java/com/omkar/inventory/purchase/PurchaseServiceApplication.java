@@ -8,7 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(scanBasePackages = {
         "com.omkar.inventory.purchase",
-        "com.omkar.inventory.common"
+        "com.omkar.inventory.common",
+        "com.omkar.inventory.order"
 })
 @EnableDiscoveryClient
 @EnableFeignClients

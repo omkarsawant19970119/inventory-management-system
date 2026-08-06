@@ -54,3 +54,111 @@ logging:
 
 jwt:
   secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
+
+resilience4j:
+
+  circuitbreaker:
+
+    instances:
+
+      productService:
+
+        slidingWindowSize: 10
+
+        minimumNumberOfCalls: 5
+
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        waitDurationInOpenState: 30s
+
+        failureRateThreshold: 50
+
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      inventoryService:
+
+        slidingWindowSize: 10
+
+        minimumNumberOfCalls: 5
+
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        waitDurationInOpenState: 30s
+
+        failureRateThreshold: 50
+
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+    resilience4j:
+
+      retry:
+
+        instances:
+
+          productService:
+
+            maxAttempts: 3
+
+            waitDuration: 2s
+
+            retryExceptions:
+              - feign.RetryableException
+              - java.net.ConnectException
+              - java.net.SocketTimeoutException
+
+          inventoryService:
+
+            maxAttempts: 3
+
+            waitDuration: 2s
+
+            retryExceptions:
+              - feign.RetryableException
+              - java.net.ConnectException
+              - java.net.SocketTimeoutException
+  resilience4j:
+    ratelimiter:
+      instances:
+
+        productService:
+          limitForPeriod: 100
+          limitRefreshPeriod: 1s
+          timeoutDuration: 0
+
+        inventoryService:
+          limitForPeriod: 100
+          limitRefreshPeriod: 1s
+          timeoutDuration: 0
+
+bulkhead:
+
+  instances:
+
+    productService:
+
+      maxConcurrentCalls: 20
+
+      maxWaitDuration: 2s
+
+    inventoryService:
+
+      maxConcurrentCalls: 20
+
+      maxWaitDuration: 2s
+
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.trusted.packages: "*"
+
+      auto-offset-reset: earliest
