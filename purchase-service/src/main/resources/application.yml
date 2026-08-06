@@ -54,3 +54,94 @@ logging:
 
 jwt:
   secret: ThisIsMyVeryLongSecretKeyForInventoryManagementSystemJWT2026SpringBootProject
+
+resilience4j:
+
+  circuitbreaker:
+
+    instances:
+
+      productService:
+
+        slidingWindowSize: 10
+
+        minimumNumberOfCalls: 5
+
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        waitDurationInOpenState: 30s
+
+        failureRateThreshold: 50
+
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      inventoryService:
+
+        slidingWindowSize: 10
+
+        minimumNumberOfCalls: 5
+
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        waitDurationInOpenState: 30s
+
+        failureRateThreshold: 50
+
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+    resilience4j:
+
+      retry:
+
+        instances:
+
+          productService:
+
+            maxAttempts: 3
+
+            waitDuration: 2s
+
+            retryExceptions:
+              - feign.RetryableException
+              - java.net.ConnectException
+              - java.net.SocketTimeoutException
+
+          inventoryService:
+
+            maxAttempts: 3
+
+            waitDuration: 2s
+
+            retryExceptions:
+              - feign.RetryableException
+              - java.net.ConnectException
+              - java.net.SocketTimeoutException
+  resilience4j:
+    ratelimiter:
+      instances:
+
+        productService:
+          limitForPeriod: 100
+          limitRefreshPeriod: 1s
+          timeoutDuration: 0
+
+        inventoryService:
+          limitForPeriod: 100
+          limitRefreshPeriod: 1s
+          timeoutDuration: 0
+
+bulkhead:
+
+      instances:
+
+        productService:
+
+          maxConcurrentCalls: 20
+
+          maxWaitDuration: 2s
+
+        inventoryService:
+
+          maxConcurrentCalls: 20
+
+          maxWaitDuration: 2s
