@@ -1,14 +1,6 @@
 package com.omkar.inventory.purchase.service;
 
 import com.omkar.inventory.common.cache.CacheNames;
-import com.omkar.inventory.common.exception.ServiceUnavailableException;
-import com.omkar.inventory.common.kafka.constants.KafkaTopics;
-import com.omkar.inventory.common.kafka.events.PurchaseCreatedEvent;
-import com.omkar.inventory.common.kafka.producer.KafkaEventPublisher;
-import com.omkar.inventory.common.resilience.FallbackMessages;
-import com.omkar.inventory.common.resilience.ResilienceConstants;
-//import com.omkar.inventory.order.dto.CreateOrderRequest;
-//import com.omkar.inventory.order.dto.OrderResponse;
 import com.omkar.inventory.purchase.client.InventoryServiceClient;
 import com.omkar.inventory.purchase.client.ProductServiceClient;
 import com.omkar.inventory.purchase.dto.PurchaseRequest;
@@ -23,11 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,14 +25,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseRepository repository;
     private final ProductServiceClient productClient;
     private final InventoryServiceClient inventoryClient;
-    private final KafkaEventPublisher kafkaProducer;
 
     @Override
     public PurchaseResponse createPurchase(PurchaseRequest request) {
 
-
-
-        getProduct(request);
+        productClient.getProduct(request.getProductId());
 
         Purchase purchase = Purchase.builder()
                 .productId(request.getProductId())
@@ -53,62 +39,14 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .purchaseDate(LocalDateTime.now())
                 .build();
 
-        Purchase savedEvent = repository.save(purchase);
+        repository.save(purchase);
 
-        PurchaseCreatedEvent kafkaEvent = PurchaseCreatedEvent.builder()
-                .eventId(UUID.randomUUID().toString())
-                .purchaseId(savedEvent.getId())
-                .productId(savedEvent.getProductId())
-                .quantity(savedEvent.getQuantity())
-                .purchasePrice(savedEvent.getPurchasePrice())
-                .supplierName(savedEvent.getSupplierName()).build();
-
-     //  addStockFromPurchase(request);
-
-        kafkaProducer.publish(
-                KafkaTopics.PURCHASE_CREATED,
-                kafkaEvent);
-
-        return map(savedEvent);
-    }
-
-    @Bulkhead(
-            name = ResilienceConstants.PRODUCT_SERVICE,
-            type = Bulkhead.Type.SEMAPHORE,
-            fallbackMethod = "productFallback")
-    @RateLimiter(
-            name = ResilienceConstants.PRODUCT_SERVICE,
-            fallbackMethod = "rateLimitingFallback")
-    @Retry(
-            name = ResilienceConstants.PRODUCT_SERVICE)
-    @CircuitBreaker(
-            name = ResilienceConstants.PRODUCT_SERVICE,
-            fallbackMethod = "getProductFromProdServiceFallback")
-    private void getProduct(PurchaseRequest request){
         inventoryClient.addStockFromPurchase(
                 request.getProductId(),
                 request.getQuantity());
 
+        return map(purchase);
     }
-
-//    @Bulkhead(
-//            name = ResilienceConstants.INVENTORY_SERVICE,
-//            type = Bulkhead.Type.SEMAPHORE,
-//            fallbackMethod = "productFallback")
-//    @RateLimiter(
-//            name = ResilienceConstants.INVENTORY_SERVICE,
-//            fallbackMethod = "rateLimitingFallback")
-//    @Retry(
-//            name = ResilienceConstants.INVENTORY_SERVICE)
-//    @CircuitBreaker(
-//            name = ResilienceConstants.INVENTORY_SERVICE,
-//            fallbackMethod = "addStockFromPurchaseFallback")
-//    private void addStockFromPurchase(PurchaseRequest request){
-//        inventoryClient.addStockFromPurchase(
-//                request.getProductId(),
-//                request.getQuantity());
-//
-//    }
 
     @Override
     public List<PurchaseResponse> getAllPurchases() {
@@ -117,22 +55,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .map(this::map)
                 .toList();
     }
-
-//    private OrderResponse addStockFromPurchaseFallback(
-//            CreateOrderRequest request,
-//            Throwable ex) {
-//
-//        throw new ServiceUnavailableException(
-//                FallbackMessages.PURCHASE_SERVICE_DOWN);
-//    }
-//
-//    private OrderResponse getProductFromProdServiceFallback(
-//            CreateOrderRequest request,
-//            Throwable ex) {
-//
-//        throw new ServiceUnavailableException(
-//                FallbackMessages.PRODUCT_SERVICE_DOWN);
-//    }
 
     @Override
     @Cacheable(value = CacheNames.PURCHASES, key = "#id")
