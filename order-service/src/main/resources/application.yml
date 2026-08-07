@@ -5,11 +5,10 @@ spring:
   application:
     name: order-service
 
-    data:
-      redis:
-        host: localhost
-        port: 6379
-        timeout: 5000
+  config:
+    import: optional:configserver:http://localhost:8888
+
+
 
   datasource:
     url: jdbc:mysql://localhost:3306/order_db
@@ -17,12 +16,17 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
   jpa:
     hibernate:
       ddl-auto: update
 
-  config:
-    import: optional:configserver:http://localhost:8888
+
 
 eureka:
   client:
@@ -123,3 +127,8 @@ jwt:
         maxConcurrentCalls: 20
 
         maxWaitDuration: 2s
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 5000
