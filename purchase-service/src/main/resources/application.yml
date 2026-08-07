@@ -132,16 +132,33 @@ resilience4j:
 
 bulkhead:
 
-      instances:
+  instances:
 
-        productService:
+    productService:
 
-          maxConcurrentCalls: 20
+      maxConcurrentCalls: 20
 
-          maxWaitDuration: 2s
+      maxWaitDuration: 2s
 
-        inventoryService:
+    inventoryService:
 
-          maxConcurrentCalls: 20
+      maxConcurrentCalls: 20
 
-          maxWaitDuration: 2s
+      maxWaitDuration: 2s
+
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.trusted.packages: "*"
+
+      auto-offset-reset: earliest

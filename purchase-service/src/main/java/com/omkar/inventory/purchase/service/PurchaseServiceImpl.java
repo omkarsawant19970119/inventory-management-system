@@ -1,11 +1,6 @@
 package com.omkar.inventory.purchase.service;
 
 import com.omkar.inventory.common.cache.CacheNames;
-import com.omkar.inventory.common.exception.ServiceUnavailableException;
-import com.omkar.inventory.common.resilience.FallbackMessages;
-import com.omkar.inventory.common.resilience.ResilienceConstants;
-import com.omkar.inventory.order.dto.CreateOrderRequest;
-import com.omkar.inventory.order.dto.OrderResponse;
 import com.omkar.inventory.purchase.client.InventoryServiceClient;
 import com.omkar.inventory.purchase.client.ProductServiceClient;
 import com.omkar.inventory.purchase.dto.PurchaseRequest;
@@ -34,7 +29,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public PurchaseResponse createPurchase(PurchaseRequest request) {
 
-        getProduct(request);
+        productClient.getProduct(request.getProductId());
 
         Purchase purchase = Purchase.builder()
                 .productId(request.getProductId())
@@ -46,47 +41,11 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         repository.save(purchase);
 
-        addStockFromPurchase(request);
+        inventoryClient.addStockFromPurchase(
+                request.getProductId(),
+                request.getQuantity());
 
         return map(purchase);
-    }
-
-    @Bulkhead(
-            name = ResilienceConstants.PRODUCT_SERVICE,
-            type = Bulkhead.Type.SEMAPHORE,
-            fallbackMethod = "productFallback")
-    @RateLimiter(
-            name = ResilienceConstants.PRODUCT_SERVICE,
-            fallbackMethod = "rateLimitingFallback")
-    @Retry(
-            name = ResilienceConstants.PRODUCT_SERVICE)
-    @CircuitBreaker(
-            name = ResilienceConstants.PRODUCT_SERVICE,
-            fallbackMethod = "getProductFromProdServiceFallback")
-    private void getProduct(PurchaseRequest request){
-        inventoryClient.addStockFromPurchase(
-                request.getProductId(),
-                request.getQuantity());
-
-    }
-
-    @Bulkhead(
-            name = ResilienceConstants.INVENTORY_SERVICE,
-            type = Bulkhead.Type.SEMAPHORE,
-            fallbackMethod = "productFallback")
-    @RateLimiter(
-            name = ResilienceConstants.INVENTORY_SERVICE,
-            fallbackMethod = "rateLimitingFallback")
-    @Retry(
-            name = ResilienceConstants.INVENTORY_SERVICE)
-    @CircuitBreaker(
-            name = ResilienceConstants.INVENTORY_SERVICE,
-            fallbackMethod = "addStockFromPurchaseFallback")
-    private void addStockFromPurchase(PurchaseRequest request){
-        inventoryClient.addStockFromPurchase(
-                request.getProductId(),
-                request.getQuantity());
-
     }
 
     @Override
@@ -95,22 +54,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .stream()
                 .map(this::map)
                 .toList();
-    }
-
-    private OrderResponse addStockFromPurchaseFallback(
-            CreateOrderRequest request,
-            Throwable ex) {
-
-        throw new ServiceUnavailableException(
-                FallbackMessages.PURCHASE_SERVICE_DOWN);
-    }
-
-    private OrderResponse getProductFromProdServiceFallback(
-            CreateOrderRequest request,
-            Throwable ex) {
-
-        throw new ServiceUnavailableException(
-                FallbackMessages.PRODUCT_SERVICE_DOWN);
     }
 
     @Override
