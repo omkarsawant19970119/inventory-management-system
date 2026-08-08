@@ -28,9 +28,10 @@ Microservices
 - Inventory Service
 - Supplier Service
 - Purchase Service
-- Sales Service
+- Order Service
 - Notification Service
-- Analytics Service
+- Reports Service
+- User Service
 
 ## Status
 
